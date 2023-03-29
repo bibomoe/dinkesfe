@@ -19,6 +19,7 @@ const RL52 = () => {
     // const [namaPropinsi, setNamaPropinsi] = useState("");
     const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
     const [bulan, setBulan] = useState('01')
+    const [namaTahun, setNamaTahun] = useState(new Date().getFullYear() - 1);
     const [namaBulan, setNamaBulan] = useState('Januari');
     const [dataRL, setDataRL] = useState([]);
     const [token, setToken] = useState("");
@@ -203,6 +204,10 @@ const RL52 = () => {
         // console.log(statusValidasiId)
     }
 
+    const changeNamaTahun = () => {
+        setNamaTahun(tahun)
+    }
+
     const Validasi = async (e) => {
         e.preventDefault();
         setSpinner(true);
@@ -329,7 +334,7 @@ const RL52 = () => {
                 setButtonStatus(false)
                 // setStatusDataValidasi()
                 setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
-                setCatatan(null)
+                setCatatan('')
             } else {
                 setStatusValidasi({ value: results.data.data.status_validasi.id, label: results.data.data.status_validasi.nama })
                 setCatatan(results.data.data.catatan)
@@ -384,6 +389,7 @@ const RL52 = () => {
             setNamaRS(results.data.dataRS.RUMAH_SAKIT);
             // setKabKota(results.)
             changeNamaBulan()
+            changeNamaTahun()
         } catch (error) {
             console.log(error);
         }
@@ -572,7 +578,7 @@ const RL52 = () => {
                                 </td>
                                 <td>RL 5.2 </td>
                                 <td>{namaRS}</td>
-                                <td>{tahun}</td>
+                                <td>{namaTahun}</td>
                                 <td>{namaBulan}</td>
                                 <td>{namakabkota}</td>
                                 <td>

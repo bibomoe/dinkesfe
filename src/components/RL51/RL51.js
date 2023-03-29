@@ -19,6 +19,7 @@ const RL51 = () => {
     // const [namaPropinsi, setNamaPropinsi] = useState("");
     const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
     const [bulan, setBulan] = useState('01')
+    const [namaTahun, setNamaTahun] = useState(new Date().getFullYear() - 1);
     const [namaBulan, setNamaBulan] = useState('Januari');
     const [dataRL, setDataRL] = useState([]);
     const [token, setToken] = useState("");
@@ -160,6 +161,10 @@ const RL51 = () => {
             setBulan(event.target.value)
         }
     };
+
+    const changeNamaTahun = () => {
+        setNamaTahun(tahun)
+    }
 
     const changeNamaBulan = () => {
         if(bulan === '01'){
@@ -329,7 +334,7 @@ const RL51 = () => {
                 setButtonStatus(false)
                 // setStatusDataValidasi()
                 setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
-                setCatatan(null)
+                setCatatan('')
             } else {
                 setStatusValidasi({ value: results.data.data.status_validasi.id, label: results.data.data.status_validasi.nama })
                 setCatatan(results.data.data.catatan)
@@ -383,6 +388,7 @@ const RL51 = () => {
             setNamaRS(results.data.dataRS.RUMAH_SAKIT);
             // setKabKota(results.)
             changeNamaBulan()
+            changeNamaTahun()
         } catch (error) {
             console.log(error);
         }
@@ -571,7 +577,7 @@ const RL51 = () => {
                                 </td>
                                 <td>RL 5.1 </td>
                                 <td>{namaRS}</td>
-                                <td>{tahun}</td>
+                                <td>{namaTahun}</td>
                                 <td>{namaBulan}</td>
                                 <td>{namakabkota}</td>
                                 <td>

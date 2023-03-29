@@ -18,6 +18,7 @@ import Select from 'react-select'
 const RL35 = () => {
     // const [namaPropinsi, setNamaPropinsi] = useState("");
     const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
+    const [namaTahun, setNamaTahun] = useState(new Date().getFullYear() - 1);
     const [dataRL, setDataRL] = useState([]);
     const [token, setToken] = useState("");
     const [expire, setExpire] = useState("");
@@ -34,7 +35,7 @@ const RL35 = () => {
     const [statusValidasi, setStatusValidasi] = useState({ value: 3, label: 'Belum divalidasi' })
     const [statusValidasiId, setStatusValidasiId] = useState(3)
     const [optionStatusValidasi, setOptionStatusValidasi] = useState([])
-    const [catatan, setCatatan] = useState("")
+    const [catatan, setCatatan] = useState(null)
     const [buttonStatus, setButtonStatus] = useState(true)
     const [statusDataValidasi, setStatusDataValidasi] = useState()
 
@@ -168,6 +169,10 @@ const RL35 = () => {
         // console.log(statusValidasiId)
     }
 
+    const changeNamaTahun = () => {
+        setNamaTahun(tahun)
+    }
+
     const Validasi = async (e) => {
         e.preventDefault();
         setSpinner(true);
@@ -294,7 +299,7 @@ const RL35 = () => {
                 setButtonStatus(false)
                 // setStatusDataValidasi()
                 setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
-                setCatatan(null)
+                setCatatan('')
             } else {
                 setStatusValidasi({ value: results.data.data.status_validasi.id, label: results.data.data.status_validasi.nama })
                 setCatatan(results.data.data.catatan)
@@ -442,6 +447,7 @@ const RL35 = () => {
             setNamaFile("RL35_" + idrs);
             setSpinner(false)
             setNamaRS(results.data.dataRS.RUMAH_SAKIT)
+            changeNamaTahun()
         } catch (error) {
             console.log(error);
         }
@@ -624,7 +630,7 @@ const RL35 = () => {
                                     </td>
                                     <td>RL 3.5 </td>
                                     <td>{namaRS}</td>
-                                    <td>{tahun}</td>
+                                    <td>{namaTahun}</td>
                                     <td>{namakabkota}</td>
                                     <td>
                                         <label htmlFor="">{value.groupNama}</label>
@@ -672,7 +678,7 @@ const RL35 = () => {
                                             </td>
                                             <td>RL 3.5 </td>
                                             <td>{namaRS}</td>
-                                            <td>{tahun}</td>
+                                            <td>{namaTahun}</td>
                                             <td>{namakabkota}</td>
                                             <td>
                                                 <label htmlFor="">{value2.jenis_kegiatan.nama}</label>

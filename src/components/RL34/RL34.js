@@ -18,6 +18,7 @@ import Select from 'react-select'
 const RL34 = () => {
     // const [namaPropinsi, setNamaPropinsi] = useState("");
     const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
+    const [namaTahun, setNamaTahun] = useState(new Date().getFullYear() - 1);
     const [dataRL, setDataRL] = useState([]);
     const [token, setToken] = useState("");
     const [expire, setExpire] = useState("");
@@ -168,6 +169,10 @@ const RL34 = () => {
         // console.log(statusValidasiId)
     }
 
+    const changeNamaTahun = () => {
+        setNamaTahun(tahun)
+    }
+
     const Validasi = async (e) => {
         e.preventDefault();
         setSpinner(true);
@@ -294,7 +299,7 @@ const RL34 = () => {
                 setButtonStatus(false)
                 // setStatusDataValidasi()
                 setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
-                setCatatan(null)
+                setCatatan('')
             } else {
                 setStatusValidasi({ value: results.data.data.status_validasi.id, label: results.data.data.status_validasi.nama })
                 setCatatan(results.data.data.catatan)
@@ -345,6 +350,7 @@ const RL34 = () => {
             setSpinner(false);
             console.log(dataRL)
             setNamaRS(results.data.dataRS.RUMAH_SAKIT);
+            changeNamaTahun()
             // setKabKota(results.)
         } catch (error) {
             console.log(error);
@@ -529,7 +535,7 @@ const RL34 = () => {
                                 </td>
                                 <td>RL 3.4 </td>
                                 <td>{namaRS}</td>
-                                <td>{tahun}</td>
+                                <td>{namaTahun}</td>
                                 <td>{namakabkota}</td>
                                 <td>
                                     <label htmlFor="">{value.jenis_kegiatan.nama}</label>
