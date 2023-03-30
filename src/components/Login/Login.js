@@ -21,7 +21,7 @@ const Login = () => {
                     'Content-Type': 'application/json'
                 }
             } 
-            const results = await axios.post('/apisirsadmin/login',{
+            const results = await axios.post('/apisirs/loginadmin',{
                 userName: email,
                 password: password
             }, customConfig)

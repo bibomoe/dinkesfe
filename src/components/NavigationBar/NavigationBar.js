@@ -14,7 +14,7 @@ const NavigationBar = () => {
     },[])
     const Logout = async() => {
         try {
-            await axios.delete('/apisirsadmin/logout')
+            await axios.delete('/apisirs/logoutadmin')
             localStorage.removeItem('name')
             navigate('/')
         } catch (error) {

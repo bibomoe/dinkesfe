@@ -30,6 +30,7 @@ const RL52 = () => {
     const [namafile, setNamaFile] = useState("");
     const [namaRS, setNamaRS] = useState("");
     const [namakabkota, setKabKota] = useState("");
+    const [namakabkotaView, setKabKotaView] = useState("");
     const [statusValidasi, setStatusValidasi] = useState({ value: 3, label: 'Belum divalidasi' })
     const [statusValidasiId, setStatusValidasiId] = useState(3)
     const [optionStatusValidasi, setOptionStatusValidasi] = useState([])
@@ -49,7 +50,7 @@ const RL52 = () => {
 
     const refreshToken = async () => {
         try {
-        const response = await axios.get("/apisirsadmin/token");
+        const response = await axios.get("/apisirs/token");
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
         setExpire(decoded.exp);
@@ -66,7 +67,7 @@ const RL52 = () => {
         async (config) => {
         const currentDate = new Date();
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get("/apisirsadmin/token");
+            const response = await axios.get("/apisirs/token");
             config.headers.Authorization = `Bearer ${response.data.accessToken}`;
             setToken(response.data.accessToken);
             const decoded = jwt_decode(response.data.accessToken);
@@ -81,7 +82,7 @@ const RL52 = () => {
 
     const getDataKabkota = async () => {
         try {
-        const response = await axiosJWT.get("/apisirsadmin/kabkota");
+        const response = await axiosJWT.get("/apisirs/kabkota");
         const kabkotaDetails = response.data.data.map((value) => {
             return value;
         });
@@ -104,7 +105,7 @@ const RL52 = () => {
 
     const getStatusValidasi = async () => {
         try {
-            const response = await axios.get("/apisirsadmin/statusvalidasi")
+            const response = await axios.get("/apisirs/statusvalidasi")
             const statusValidasiTemplate = response.data.data.map((value, index) => {
                 return {
                     value: value.id,
@@ -121,14 +122,17 @@ const RL52 = () => {
 
     const searchRS = async (e) => {
         try {
-        const responseRS = await axiosJWT.get(
-            "/apisirsadmin/rumahsakit/" + e.target.value,
-            {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            }
-        );
+            const responseRS = await axiosJWT.get(
+                "/apisirs/rumahsakit/",
+                {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                params: {
+                    kabkotaid: e.target.value
+                }
+                }
+            );
         const DetailRS = responseRS.data.data.map((value) => {
             return value;
         });
@@ -218,6 +222,10 @@ const RL52 = () => {
         setNamaTahun(tahun)
     }
 
+    const changeNamaKota = () => {
+        setKabKotaView(namakabkota)
+    }
+
     const changeValidateAccess = () => {
         console.log(kategoriUser)
         if(kategoriUser == 2) {
@@ -261,7 +269,7 @@ const RL52 = () => {
                         },
                     };
                     const results = await axiosJWT.get(
-                        "/apisirsadmin/validasi",
+                        "/apisirs/validasi",
                         customConfig
                     )
         
@@ -282,7 +290,7 @@ const RL52 = () => {
                                 'Authorization': `Bearer ${token}`
                             }
                         }
-                        const result = await axiosJWT.post('/apisirsadmin/validasi',{
+                        const result = await axiosJWT.post('/apisirs/validasi',{
                             rsId: idrs,
                             rlId: 22,
                             tahun: date,
@@ -308,7 +316,7 @@ const RL52 = () => {
                                         'Authorization': `Bearer ${token}`
                                     }
                                 }
-                        await axiosJWT.patch('/apisirsadmin/validasi/' + statusDataValidasi, {
+                        await axiosJWT.patch('/apisirs/validasi/' + statusDataValidasi, {
                             statusValidasiId: statusValidasiId,
                             catatan: catatan
                         }, customConfig);
@@ -348,7 +356,7 @@ const RL52 = () => {
                 },
             };
             const results = await axiosJWT.get(
-                "/apisirsadmin/validasi",
+                "/apisirs/validasi",
                 customConfig
             )
 
@@ -394,7 +402,7 @@ const RL52 = () => {
                     },
                 };
                 const results = await axiosJWT.get(
-                    "/apisirsadmin/rllimatitikdua",
+                    "/apisirs/rllimatitikduaadmin",
                     customConfig
                 );
 
@@ -420,6 +428,7 @@ const RL52 = () => {
                 // setKabKota(results.)
                 changeNamaBulan()
                 changeNamaTahun()
+                changeNamaKota()
             } catch (error) {
                 console.log(error);
             }
@@ -623,7 +632,7 @@ const RL52 = () => {
                                 <td>{namaRS}</td>
                                 <td>{namaTahun}</td>
                                 <td>{namaBulan}</td>
-                                <td>{namakabkota}</td>
+                                <td>{namakabkotaView}</td>
                                 <td>
                                     <label htmlFor="">{value.jenis_kegiatan.nama}</label>
                                 </td>
