@@ -6,17 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { HiSaveAs } from "react-icons/hi";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
-// import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import Table from "react-bootstrap/Table";
-// import { RiDeleteBin5Fill, RiEdit2Fill } from "react-icons/ri";
-// import { AiFillFileAdd } from "react-icons/ai";
 import Spinner from "react-bootstrap/Spinner";
 import { DownloadTableExcel } from "react-export-table-to-excel"
 import Select from 'react-select'
 
 const RL35 = () => {
-    // const [namaPropinsi, setNamaPropinsi] = useState("");
     const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
     const [namaTahun, setNamaTahun] = useState(new Date().getFullYear() - 1);
     const [dataRL, setDataRL] = useState([]);
@@ -35,9 +31,12 @@ const RL35 = () => {
     const [statusValidasi, setStatusValidasi] = useState({ value: 3, label: 'Belum divalidasi' })
     const [statusValidasiId, setStatusValidasiId] = useState(3)
     const [optionStatusValidasi, setOptionStatusValidasi] = useState([])
-    const [catatan, setCatatan] = useState(null)
+    const [catatan, setCatatan] = useState(' ')
     const [buttonStatus, setButtonStatus] = useState(true)
     const [statusDataValidasi, setStatusDataValidasi] = useState()
+    const [validateAccess, setValidateAccess] = useState(true)
+    const [validateVisibility, setValidateVisibility] = useState("none")
+    const [kategoriUser, setKategoriUser] = useState(3)
 
     useEffect(() => {
         refreshToken();
@@ -52,6 +51,7 @@ const RL35 = () => {
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
         setExpire(decoded.exp);
+        setKategoriUser(decoded.jenis_user_id);
         // getDataRS(decoded.rsId);
         } catch (error) {
         if (error.response) {
@@ -118,7 +118,6 @@ const RL35 = () => {
         // setStatusValidasi(3)
     }
 
-
     const searchRS = async (e) => {
         try {
         const responseRS = await axiosJWT.get(
@@ -166,11 +165,23 @@ const RL35 = () => {
     const changeHandlerStatusValidasi = (selectedOption) => {
         setStatusValidasiId(parseInt(selectedOption.value))
         setStatusValidasi(selectedOption)
-        // console.log(statusValidasiId)
+        console.log(statusValidasiId)
     }
 
     const changeNamaTahun = () => {
         setNamaTahun(tahun)
+    }
+
+    const changeValidateAccess = () => {
+        console.log(kategoriUser)
+        if(kategoriUser == 2) {
+            setValidateAccess(true)
+            setValidateVisibility("none")
+        } else if(kategoriUser == 3) {
+            setValidateAccess(false)
+            setValidateVisibility("block")
+        }
+        console.log(validateAccess)
     }
 
     const Validasi = async (e) => {
@@ -299,7 +310,7 @@ const RL35 = () => {
                 setButtonStatus(false)
                 // setStatusDataValidasi()
                 setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
-                setCatatan('')
+                setCatatan(' ')
             } else {
                 setStatusValidasi({ value: results.data.data.status_validasi.id, label: results.data.data.status_validasi.nama })
                 setCatatan(results.data.data.catatan)
@@ -313,145 +324,161 @@ const RL35 = () => {
         }
     }
 
-
+    const changeValidateAccessEmpty = () => {
+        setValidateAccess(true)
+        setValidateVisibility("none")
+    }
     const Cari = async (e) => {
         e.preventDefault();
         setSpinner(true);
-
-        try {
-            const customConfig = {
-                headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-                },
-                params: {
-                koders: idrs,
-                tahun: tahun,
-                },
-            };
-            const results = await axiosJWT.get(
-                "/apisirsadmin/rltigatitiklima",
-                customConfig
-            );
-
-            console.log(results)
-            const rlTigaTitikLimaDetails = results.data.data.map((value) => {
-                return value.rl_tiga_titik_lima_details;
-            });
-
-            let dataRLTigaTitikLimaDetails = [];
-            rlTigaTitikLimaDetails.forEach((element) => {
-                element.forEach((value) => {
-                dataRLTigaTitikLimaDetails.push(value);
-                });
-            });
-
-            // setDataRL(dataRLTigaTitikLimaDetails);
-
-            let sortedProducts = dataRLTigaTitikLimaDetails.sort((p1, p2) =>
-                        p1.jenis_kegiatan_id > p2.jenis_kegiatan_id
-                    ? 1
-                    : p1.jenis_kegiatan_id < p2.jenis_kegiatan_id
-                    ? -1
-                    : 0
-            )
-
-            // console.log(sortedProducts)
-
-            let groups = []
-
-            sortedProducts.reduce(function (res, value) {
-                if (!res[value.jenis_kegiatan.group_jenis_kegiatan_id]) {
-                    res[value.jenis_kegiatan.group_jenis_kegiatan_id] = {
-                    groupId: value.jenis_kegiatan.group_jenis_kegiatan_id,
-                    groupNama:
-                        value.jenis_kegiatan.group_jenis_kegiatan_header.nama,
-                    groupNo:
-                        value.jenis_kegiatan.group_jenis_kegiatan_header.no,
-                    // jumlah: 0,
-                    rmRumahSakit: 0,
-                    rmBidan: 0,
-                    rmPuskesmas: 0,
-                    rmFaskesLainnya: 0,
-                    rmMati: 0,
-                    rmTotal: 0,
-                    rnmMati: 0,
-                    rnmTotal: 0,
-                    nrMati: 0,
-                    nrTotal: 0,
-                    dirujuk: 0
-
+        changeValidateAccess()
+            if(idrs != ""){
+                try {
+                    const customConfig = {
+                        headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                        },
+                        params: {
+                        koders: idrs,
+                        tahun: tahun,
+                        },
                     };
-                    groups.push(
-                    res[value.jenis_kegiatan.group_jenis_kegiatan_id]
+                    const results = await axiosJWT.get(
+                        "/apisirsadmin/rltigatitiklima",
+                        customConfig
+                    );
+        
+                    console.log(results)
+                    const rlTigaTitikLimaDetails = results.data.data.map((value) => {
+                        return value.rl_tiga_titik_lima_details;
+                    });
+        
+                    let dataRLTigaTitikLimaDetails = [];
+                    rlTigaTitikLimaDetails.forEach((element) => {
+                        element.forEach((value) => {
+                        dataRLTigaTitikLimaDetails.push(value);
+                        });
+                    });
+        
+                    // setDataRL(dataRLTigaTitikLimaDetails);
+        
+                    let sortedProducts = dataRLTigaTitikLimaDetails.sort((p1, p2) =>
+                                p1.jenis_kegiatan_id > p2.jenis_kegiatan_id
+                            ? 1
+                            : p1.jenis_kegiatan_id < p2.jenis_kegiatan_id
+                            ? -1
+                            : 0
                     )
+        
+                    // console.log(sortedProducts)
+        
+                    let groups = []
+        
+                    sortedProducts.reduce(function (res, value) {
+                        if (!res[value.jenis_kegiatan.group_jenis_kegiatan_id]) {
+                            res[value.jenis_kegiatan.group_jenis_kegiatan_id] = {
+                            groupId: value.jenis_kegiatan.group_jenis_kegiatan_id,
+                            groupNama:
+                                value.jenis_kegiatan.group_jenis_kegiatan_header.nama,
+                            groupNo:
+                                value.jenis_kegiatan.group_jenis_kegiatan_header.no,
+                            // jumlah: 0,
+                            rmRumahSakit: 0,
+                            rmBidan: 0,
+                            rmPuskesmas: 0,
+                            rmFaskesLainnya: 0,
+                            rmMati: 0,
+                            rmTotal: 0,
+                            rnmMati: 0,
+                            rnmTotal: 0,
+                            nrMati: 0,
+                            nrTotal: 0,
+                            dirujuk: 0
+        
+                            };
+                            groups.push(
+                            res[value.jenis_kegiatan.group_jenis_kegiatan_id]
+                            )
+                        }
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmRumahSakit +=
+                            value.rmRumahSakit
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmBidan +=
+                            value.rmBidan
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmPuskesmas +=
+                            value.rmPuskesmas
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmFaskesLainnya +=
+                            value.rmFaskesLainnya
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmMati +=
+                            value.rmMati
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmTotal +=
+                            value.rmTotal
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].rnmMati +=
+                            value.rnmMati
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].rnmTotal +=
+                            value.rnmTotal
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].nrMati +=
+                            value.nrMati
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].nrTotal +=
+                            value.nrTotal
+                        res[value.jenis_kegiatan.group_jenis_kegiatan_id].dirujuk +=
+                            value.dirujuk
+                        return res;
+                    }, {})
+        
+                    let data = []
+        
+                    groups.forEach((element) => {
+                    if (element.groupId != null) {
+                        const filterData = sortedProducts.filter((value, index) => {
+                        return (
+                            value.jenis_kegiatan.group_jenis_kegiatan_id ===
+                            element.groupId
+                        );
+                        });
+                        data.push({
+                        groupId: element.groupId,
+                        groupNo: element.groupNo,
+                        groupNama: element.groupNama,
+                        details: filterData,
+                        // subTotal: element.jumlah,
+                        subTotalRmRumahSakit: element.rmRumahSakit,
+                        subTotalRmBidan: element.rmBidan,
+                        subTotalRmPuskesmas: element.rmPuskesmas,
+                        subTotalRmFaskesLainnya: element.rmFaskesLainnya,
+                        subTotalRmMati: element.rmMati,
+                        subTotalRmTotal: element.rmTotal,
+                        subTotalRnmMati: element.rnmMati,
+                        subTotalRnmTotal: element.rnmTotal,
+                        subTotalNrMati: element.nrMati,
+                        subTotalNrTotal: element.nrTotal,
+                        subTotalDirujuk: element.dirujuk
+                        })
+                    }
+                    })
+        
+                    if(!data.length){
+                        changeValidateAccessEmpty()
+                    }
+                    console.log(data)
+                    setDataRL(data)
+        
+                    setNamaFile("RL35_" + idrs);
+                    setSpinner(false)
+                    setNamaRS(results.data.dataRS.RUMAH_SAKIT)
+                    changeNamaTahun()
+                } catch (error) {
+                    console.log(error);
                 }
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmRumahSakit +=
-                    value.rmRumahSakit
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmBidan +=
-                    value.rmBidan
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmPuskesmas +=
-                    value.rmPuskesmas
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmFaskesLainnya +=
-                    value.rmFaskesLainnya
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmMati +=
-                    value.rmMati
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].rmTotal +=
-                    value.rmTotal
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].rnmMati +=
-                    value.rnmMati
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].rnmTotal +=
-                    value.rnmTotal
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].nrMati +=
-                    value.nrMati
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].nrTotal +=
-                    value.nrTotal
-                res[value.jenis_kegiatan.group_jenis_kegiatan_id].dirujuk +=
-                    value.dirujuk
-                return res;
-            }, {})
-
-            let data = []
-
-            groups.forEach((element) => {
-            if (element.groupId != null) {
-                const filterData = sortedProducts.filter((value, index) => {
-                return (
-                    value.jenis_kegiatan.group_jenis_kegiatan_id ===
-                    element.groupId
-                );
-                });
-                data.push({
-                groupId: element.groupId,
-                groupNo: element.groupNo,
-                groupNama: element.groupNama,
-                details: filterData,
-                // subTotal: element.jumlah,
-                subTotalRmRumahSakit: element.rmRumahSakit,
-                subTotalRmBidan: element.rmBidan,
-                subTotalRmPuskesmas: element.rmPuskesmas,
-                subTotalRmFaskesLainnya: element.rmFaskesLainnya,
-                subTotalRmMati: element.rmMati,
-                subTotalRmTotal: element.rmTotal,
-                subTotalRnmMati: element.rnmMati,
-                subTotalRnmTotal: element.rnmTotal,
-                subTotalNrMati: element.nrMati,
-                subTotalNrTotal: element.nrTotal,
-                subTotalDirujuk: element.dirujuk
+                
+            } else {
+                toast('Filter tidak boleh kosong', {
+                    position: toast.POSITION.TOP_RIGHT
                 })
+                changeValidateAccessEmpty()
             }
-            })
-            console.log(data)
-            setDataRL(data)
-
-            setNamaFile("RL35_" + idrs);
-            setSpinner(false)
-            setNamaRS(results.data.dataRS.RUMAH_SAKIT)
-            changeNamaTahun()
-        } catch (error) {
-            console.log(error);
-        }
-
+        
+        setSpinner(false);
         getDataStatusValidasi()
     }
 
@@ -461,23 +488,23 @@ const RL35 = () => {
             <div className="col-md-6">
                 <div className="card">
                     <div className="card-body">
-                        <h5 className="card-title h5">Validasi RL</h5>
+                        <h5 className="card-title h5">Validasi RL 3.5</h5>
                         <form onSubmit={Validasi}>
                         {/* <div className="form-floating" style={{width:"100%", display:"inline-block"}}> */}
                             <Select
                                 options={optionStatusValidasi} className="form-control" name="status_validasi_id" id="status_validasi_id"
-                                onChange={changeHandlerStatusValidasi} value={statusValidasi}
+                                onChange={changeHandlerStatusValidasi} value={statusValidasi} isDisabled={validateAccess}
                             />
                             {/* <label htmlFor="status_validasi_id">Status Validasi</label> */}
                         {/* </div> */}
                             <div className="form-floating" style={{width:"100%", display:"inline-block"}}>
-                                <input name="catatan" type="text" className="form-control" id="floatingInputCatatan" 
+                                <input name="catatan" type="text" className="form-control" id="floatingInputCatatan" disabled={validateAccess}
                                     placeholder="catatan" value={catatan} onChange={e => changeHandlerCatatan(e)} />
                                 <label htmlFor="floatingInputCatatan">Catatan Tidak Diterima</label>
                             </div>
-                            <div className="mt-3 mb-3">
+                            <div className="mt-3">
                                 <ToastContainer />
-                                <button type="submit" disabled={buttonStatus} className="btn btn-outline-success"><HiSaveAs size={20}/> Simpan</button>
+                                <button type="submit" disabled={buttonStatus} style={{display: validateVisibility}} className="btn btn-outline-success"><HiSaveAs size={20} /> Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -491,7 +518,7 @@ const RL35 = () => {
                     Filter RL 3.5
                     </h5>
                     <div
-                    className="form-floating"
+                    className="form-floating" 
                     style={{ width: "100%", display: "inline-block" }}
                     >
                     <select
@@ -517,46 +544,50 @@ const RL35 = () => {
                     <label htmlFor="floatingInput">Kab. Kota :</label>
                     </div>
 
-                    <div
-                    className="form-floating"
-                    style={{ width: "100%", display: "inline-block" }}
-                    >
-                    <select
-                        name="rumahsakit"
-                        typeof="select"
-                        className="form-control"
-                        id="floatingselect"
-                        placeholder="Rumah Sakit"
-                        onChange={(e) => changeHandlerRS(e)}
-                    >
-                        <option value="">Pilih Rumah Sakit</option>
-                        {optionsrs.map((option) => {
-                        return (
-                            <option key={option.value} value={option.value}>
-                            {option.key}
-                            </option>
-                        );
-                        })}
-                    </select>
-                    <label htmlFor="floatingInput">Rumah Sakit :</label>
+                    <div className="row">
+                        <div className="col-md-8">
+                            <div
+                                className="form-floating"
+                                style={{ width: "100%", display: "inline-block" }}
+                                >
+                                <select
+                                    name="rumahsakit"
+                                    typeof="select"
+                                    className="form-control"
+                                    id="floatingselect"
+                                    placeholder="Rumah Sakit"
+                                    onChange={(e) => changeHandlerRS(e)}
+                                >
+                                    <option value="">Pilih Rumah Sakit</option>
+                                    {optionsrs.map((option) => {
+                                    return (
+                                        <option key={option.value} value={option.value}>
+                                        {option.key}
+                                        </option>
+                                    );
+                                    })}
+                                </select>
+                                <label htmlFor="floatingInput">Rumah Sakit :</label>
+                            </div>
+                        </div>
+                        <div className="col-md-4">
+                            <div className="form-floating" style={{ width: "100%", display: "inline-block" }}>
+                                <input
+                                    name="tahun"
+                                    type="number" min="2022"
+                                    className="form-control"
+                                    id="floatingInput"
+                                    placeholder="Tahun" 
+                                    value={tahun}
+                                    onChange={(e) => changeHandlerSingle(e)}
+                                />
+                                <label htmlFor="floatingInput">Tahun</label>
+                            </div>
+                        </div>
                     </div>
-
-                    <div
-                    className="form-floating"
-                    style={{ width: "100%", display: "inline-block" }}
-                    >
-                    <input
-                        name="tahun"
-                        type="number" min="2022"
-                        className="form-control"
-                        id="floatingInput"
-                        placeholder="Tahun" 
-                        value={tahun}
-                        onChange={(e) => changeHandlerSingle(e)}
-                    />
-                    <label htmlFor="floatingInput">Tahun</label>
-                    </div>
-                    <div className="mt-3 mb-3">
+                    
+                    
+                    <div className="mt-3">
                     <button type="submit" className="btn btn-outline-success">
                         <HiSaveAs /> Cari
                     </button>
