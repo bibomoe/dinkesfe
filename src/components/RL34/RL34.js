@@ -147,10 +147,18 @@ const RL34 = () => {
             console.log(error);
         }
         }
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     };
 
     const changeHandlerSingle = (event) => {
         setTahun(event.target.value);
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     };
 
     const changeHandlerCatatan = (event) => {
@@ -159,6 +167,10 @@ const RL34 = () => {
 
     const changeHandlerRS = (event) => {
         setIdRS(event.target.value);
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     }
 
     const changeHandlerStatusValidasi = (selectedOption) => {

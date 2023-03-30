@@ -148,10 +148,18 @@ const RL35 = () => {
             console.log(error);
         }
         }
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     };
 
     const changeHandlerSingle = (event) => {
-        setTahun(event.target.value);
+        setTahun(event.target.value)
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     };
 
     const changeHandlerCatatan = (event) => {
@@ -160,6 +168,10 @@ const RL35 = () => {
 
     const changeHandlerRS = (event) => {
         setIdRS(event.target.value);
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     }
 
     const changeHandlerStatusValidasi = (selectedOption) => {
@@ -328,6 +340,7 @@ const RL35 = () => {
         setValidateAccess(true)
         setValidateVisibility("none")
     }
+
     const Cari = async (e) => {
         e.preventDefault();
         setSpinner(true);

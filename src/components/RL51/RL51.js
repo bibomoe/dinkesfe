@@ -150,6 +150,10 @@ const RL51 = () => {
             console.log(error);
         }
         }
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     };
 
     const changeHandlerSingle = (event) => {
@@ -159,6 +163,10 @@ const RL51 = () => {
         } else if (name === 'bulan') {
             setBulan(event.target.value)
         }
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     };
 
     const changeNamaTahun = () => {
@@ -199,6 +207,10 @@ const RL51 = () => {
 
     const changeHandlerRS = (event) => {
         setIdRS(event.target.value);
+
+        changeValidateAccessEmpty()
+        setStatusValidasi({ value: 3, label: 'Belum divalidasi' })
+        setCatatan(' ')
     }
 
     const changeHandlerStatusValidasi = (selectedOption) => {
