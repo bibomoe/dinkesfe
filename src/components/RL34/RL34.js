@@ -11,6 +11,8 @@ import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
 import { DownloadTableExcel } from "react-export-table-to-excel"
 import Select from 'react-select'
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import Form from "react-bootstrap/Form";
 
 const RL34 = () => {
     const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
@@ -421,9 +423,21 @@ const RL34 = () => {
                             {/* <label htmlFor="status_validasi_id">Status Validasi</label> */}
                         {/* </div> */}
                             <div className="form-floating" style={{width:"100%", display:"inline-block"}}>
-                                <input name="catatan" type="text" className="form-control" id="floatingInputCatatan" disabled={validateAccess}
-                                    placeholder="catatan" value={catatan} onChange={e => changeHandlerCatatan(e)} />
-                                <label htmlFor="floatingInputCatatan">Catatan Tidak Diterima</label>
+                                {/* <input name="catatan" type="text" className="form-control" id="floatingInputCatatan" disabled={validateAccess}
+                                    placeholder="catatan" value={catatan} onChange={e => changeHandlerCatatan(e)} /> */}
+                                    <FloatingLabel label="Catatan :">
+                                        <Form.Control
+                                            as="textarea"
+                                            name="catatan"
+                                            placeholder="Leave a comment here"
+                                            id="floatingInputCatatan"
+                                            style={{ height: "100px" }}
+                                            disabled={validateAccess}
+                                            value={catatan}
+                                            onChange={(e) => changeHandlerCatatan(e)}
+                                        />
+                                    </FloatingLabel>
+                                {/* <label htmlFor="floatingInputCatatan">Catatan Tidak Diterima</label> */}
                             </div>
                             <div className="mt-3">
                                 <ToastContainer />
